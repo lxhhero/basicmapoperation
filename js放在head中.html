@@ -9,20 +9,27 @@
   <link rel="stylesheet" href="http://js.arcgis.com/3.14/esri/css/esri.css">
 
   <style>
+
     html, body {
       height: 100%;
       width: 100%;
       margin: 0;
-      padding: 0; }
-  </style>
+      padding: 0;
+    }
 
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+
+  </style>
 
   <script src="http://js.arcgis.com/3.14/"></script>
 
   <script>
 
     var map;
-    var PLQLayer;
+    var plqLayer;
     var overviewMap;
 
     require([
@@ -30,8 +37,6 @@
       "esri/layers/ArcGISDynamicMapServiceLayer",
       "esri/dijit/OverviewMap",
       "dojo/parser",
-      "dijit/layout/BorderContainer",
-      "dijit/layout/ContentPane",
       "dojo/domReady!"
     ], function (
       Map,
@@ -39,6 +44,7 @@
       OverviewMap,
       parser
     ) {
+
       parser.parse();
 
       //initialize a map
@@ -48,20 +54,26 @@
       });
 
       //define a layer and load the data in
-      PLQLayer = new ArcGISDynamicMapServiceLayer("http://localhost:6080/arcgis/rest/services/DataPanLongQu/MapServer");
+      plqLayer = new ArcGISDynamicMapServiceLayer("http://localhost:6080/arcgis/rest/services/DataPanLongQu/MapServer");
 
       //add the layer to the map
-      map.addLayer(PLQLayer);
+      map.addLayer(plqLayer);
 
       //overviewMap
       overviewMap = new OverviewMap({
         map: map,
-        visible: true
+        visible: true,
+        attachTo: "bottom-right"
       });
-
       overviewMap.startup();
 
     });
+
+    //add the measurement
+    var measurement = new Measurement({
+      map: map,
+    }, dojo.byId("measurement"));
+    measurement.startup();
 
   </script>
 
@@ -69,16 +81,10 @@
 
 <body class="claro">
 
-<div data-dojo-type="dijit/layout/BorderContainer"
-     data-dojo-props="design:'headline', gutters:false"
-     style="width: 100%; height: 100%; margin:0;">
-
-  <div id="map"
-       data-dojo-type="dijit/layout/ContentPane"
-       data-dojo-props="region:'center'"
-       style="padding:0">
+  <div id="map">
+    <div id="overviewMap"></div>
+      <div id="measurement"></div>
   </div>
-</div>
 
 </body>
 </html>
