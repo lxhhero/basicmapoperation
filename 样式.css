@@ -1,0 +1,60 @@
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+#map {
+  width: 1250px;
+  height: 780px;
+  background: #d3faef;
+  right:5px;
+  top: 10px;
+  position:absolute;
+  border: 2px solid #bebebe;
+}
+
+#overviewMap {
+  z-index: 999;
+  width: 305px;
+  height:180px;
+  position: absolute;
+  left: 5px;
+  top: 600px;
+  border: 2px solid #bebebe;
+}
+
+#measurement {
+  z-index: 999;
+  width: 305px;
+  height:165px;
+  position: absolute;
+  left: 5px;
+  top: 420px;
+  border: 2px solid #bebebe;
+}
+
+#homebutton {
+  position: absolute;
+  top: 90px;
+  left: 20px;
+  z-index: 50;
+}
+
+#locatebutton {
+  position: absolute;
+  top: 130px;
+  left: 20px;
+  z-index: 50;
+}
+
+#legend {
+  z-index: 999;
+  width: 305px;
+  height:400px;
+  position: absolute;
+  left: 5px;
+  top: 10px;
+  border: 2px solid #bebebe;
+}
