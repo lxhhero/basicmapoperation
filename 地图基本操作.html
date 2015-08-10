@@ -7,23 +7,7 @@
   <title>地图基本操作</title>
   <link rel="stylesheet" href="http://js.arcgis.com/3.14/dijit/themes/claro/claro.css">
   <link rel="stylesheet" href="http://js.arcgis.com/3.14/esri/css/esri.css">
-
-  <style>
-
-    html, body {
-      height: 100%;
-      width: 100%;
-      margin: 0;
-      padding: 0;
-    }
-
-    #map {
-      width: 100%;
-      height: 100%;
-    }
-
-  </style>
-
+  <link rel="stylesheet" href="all.css">
   <script src="http://js.arcgis.com/3.14/"></script>
 
   <script>
@@ -31,17 +15,44 @@
     var map;
     var plqLayer;
     var overviewMap;
+    var measurement;
+    var homebutton;
+    var locateButton;
+    var legend;
+    var scaleber;
 
     require([
       "esri/map",
       "esri/layers/ArcGISDynamicMapServiceLayer",
       "esri/dijit/OverviewMap",
+      "esri/dijit/HomeButton",
+      "esri/dijit/LocateButton",
+      "esri/geometry/geometryEngine",
+      "esri/tasks/GeometryService",
+      "esri/tasks/ProjectParameters",
+      "esri/config",
+      "esri/dijit/Measurement",
+      "esri/dijit/Legend",
+      "esri/dijit/Scalebar",
+      "dojo/_base/array",
+      "dijit/TitlePane",
       "dojo/parser",
       "dojo/domReady!"
     ], function (
       Map,
       ArcGISDynamicMapServiceLayer,
       OverviewMap,
+      HomeButton,
+      LocateButton,
+      geometryEngine,
+      GeometryService,
+      ProjectParameters,
+      esriConfig,
+      Measurement,
+      Legend,
+      Scalebar,
+      arrayUtils,
+      TitlePane,
       parser
     ) {
 
@@ -54,7 +65,10 @@
       });
 
       //define a layer and load the data in
-      plqLayer = new ArcGISDynamicMapServiceLayer("http://localhost:6080/arcgis/rest/services/DataPanLongQu/MapServer");
+      plqLayer = new ArcGISDynamicMapServiceLayer("http://localhost:6080/arcgis/rest/services/DataPanLongQu/MapServer",{
+        mode: ArcGISDynamicMapServiceLayer.MODE_ONDEMAND,
+        outFields:["*"]
+      });
 
       //add the layer to the map
       map.addLayer(plqLayer);
@@ -63,17 +77,56 @@
       overviewMap = new OverviewMap({
         map: map,
         visible: true,
-        attachTo: "bottom-right"
-      });
+        opacity: .50,
+        expandFactor:3
+      },"overviewMap");
       overviewMap.startup();
 
+      //add HomeButton
+      homebutton = new HomeButton({
+        map: map,
+        visible: true
+      }, "homebutton");
+      homebutton.startup();
+
+      //add the locatebutton
+      locateButton = new LocateButton({
+        map: map
+      }, "locatebutton");
+      locateButton.startup();
+
+      //add the measurement
+      esriConfig.defaults.io.proxyUrl = "/proxy/";
+      esriConfig.defaults.io.alwaysUseProxy = false;
+      esriConfig.defaults.geometryService = new GeometryService("http://tasks.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer");
+      //gsvc = new GeometryService("http://tasks.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer");
+      measurement = new Measurement({
+        map: map
+      }, "measurement");
+      measurement.startup();
+
+      //add the legend
+      map.on("layers-add-result", function (evt) {
+        var layerInfo = arrayUtils.map(evt.layers, function (layer,index) {
+          return {layer:layer.layer, title:layer.layer.name};
+        });
+        if (layerInfo.length > 0) {
+          legend = new Legend({
+            map: map,
+            layerInfos: layerInfo,
+            visible: true
+          }, "legend");
+          legend.startup();
+        }
+      });
+
+      //add the scalerbar
+      scalebar = new Scalebar({
+        map: map,
+        scalebarUnit: "metric"
+      });
     });
 
-    //add the measurement
-    var measurement = new Measurement({
-      map: map,
-    }, dojo.byId("measurement"));
-    measurement.startup();
 
   </script>
 
@@ -81,10 +134,12 @@
 
 <body class="claro">
 
-  <div id="map">
-    <div id="overviewMap"></div>
-      <div id="measurement"></div>
-  </div>
-
+<div id="map">
+  <div id="homebutton"></div>
+  <div id="locatebutton"></div>
+</div>
+<div id="overviewMap"></div>
+<div id="measurement"></div>
+<div id="legend"></div>
 </body>
 </html>
